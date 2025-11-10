@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncIterable, Iterable, Set
+from typing import AsyncIterable, Set, AsyncGenerator
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -31,7 +31,7 @@ class DirectoryFileDataLoader(ABC):
         self.show_progress = show_progress
     
     @abstractmethod
-    async def read_file(self, file: FileData) -> Iterable[Document]:
+    def read_file(self, file: FileData) -> AsyncGenerator[Document, None]:
         ...
 
     async def read_directory(self) -> AsyncIterable[FileData]:
@@ -58,8 +58,7 @@ class DirectoryFileDataLoader(ABC):
                 f"from url: {file_data.url}"
             )
             try:
-                documents = await self.read_file(file_data)
-                for doc in documents:
+                async for doc in self.read_file(file_data):
                     await self.index.ainsert(doc)
                 files_processed += 1
                 logger.info(
@@ -71,13 +70,16 @@ class DirectoryFileDataLoader(ABC):
                     exc_info=True
                 )
         logger.info(f"Finished loading. Total files: {files_processed}")
-        if (self.embed_kg_nodes and hasattr(self.index, 'vector_store') 
-            and self.index.vector_store is not None):
+        if (self.embed_kg_nodes 
+            and hasattr(self.index, 'vector_store') 
+            and self.index.vector_store is not None
+        ):
             logger.info(f"Persisting vector store")
             await asyncio.to_thread(
-                self.index.storage_context.vector_store.persist,
+                self.index.vector_store.persist,
                 persist_path=str(settings.VECTOR_STORE_PATH)
             )
+            self.index.
         return DataLoadingResult(
             status="ok",
             files_loaded=files_processed,
@@ -109,12 +111,14 @@ class MarkdownFileDataLoader(DirectoryFileDataLoader):
         self.remove_images = remove_images
         self.separator = separator
 
-    async def read_file(self, file: FileData) -> Iterable[Document]:
-        loader = MarkdownReader(self.remove_hyperlinks, 
-                                self.remove_images,
-                                self.separator)
+    async def read_file(self, file: FileData) -> AsyncGenerator[Document, None]:
+        loader = MarkdownReader(
+            self.remove_hyperlinks, 
+            self.remove_images,
+            self.separator
+        )
         documents = await loader.aload_data(file.path)
         for doc in documents:
             doc.metadata["source_url"] = file.url
             doc.metadata["file_name"] = file.path.name
-        return documents
+            yield doc
