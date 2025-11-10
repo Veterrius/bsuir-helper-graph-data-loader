@@ -4,19 +4,25 @@ from urllib.parse import urlparse, urlunparse
 from dataclasses import dataclass
 from typing import NewType, Tuple
 from functools import reduce
+from mimetypes import guess_type
+from datetime import datetime
+
+from .schemas import FileInfo
+from .config import settings
 
 
 Url = NewType('Url', str)
 Sheme = NewType('Sheme', str)
 Domain = NewType('Domain', str)
 PathPart = NewType('PathPart', str)
+Extension = NewType('Extension', str)
 
 
 @dataclass
 class FileData:
     DIR_SEP = '_'
     url: Url
-    extension: str
+    extension: Extension
     content: bytes | None = None
 
     @property
@@ -86,4 +92,21 @@ class FileData:
             content = None
         url = cls.get_url_from_path(path) 
         return cls(url=Url(url), extension=path.suffix, content=content)
-
+    
+    @classmethod
+    def from_file_info(cls, file_info: FileInfo) -> FileData:
+        ...
+    
+    def to_file_info(self) -> FileInfo:
+        return FileInfo(
+            name=str(self.path),
+            size=self.size,
+            content_type=(
+                content_type
+                if (content_type:=guess_type(self.extension)[0]) is not None
+                else 'unknown'
+            ),
+            upload_time=datetime.fromtimestamp(
+                (settings.get_upload_dir() / self.path).stat().st_birthtime
+            )
+        )
