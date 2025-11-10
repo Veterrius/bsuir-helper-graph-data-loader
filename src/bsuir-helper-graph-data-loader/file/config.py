@@ -1,4 +1,4 @@
-from settings import Settings
+from ..config import Settings
 
 
 class FileSettings(Settings):

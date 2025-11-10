@@ -4,6 +4,7 @@ from typing import Set
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from .models import Extension
 
 class Settings(BaseSettings):
     UPLOAD_DIR: Path
@@ -20,11 +21,20 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    def get_model_name(self):
+    def get_model_name(self) -> str:
         return self.MODEL_NAME
 
-    def get_embeddings_model_name(self):
+    def get_embeddings_model_name(self) -> str:
         return self.EMBEDDINGS_MODEL_NAME
-    
+
+    def get_upload_dir(self) -> Path:
+        ...    
+
+    def get_max_file_size(self) -> int:
+        ...    
+
+    def get_allowed_extensions(self) -> Set[Extension]:
+        ...    
+
 
 settings = Settings()
