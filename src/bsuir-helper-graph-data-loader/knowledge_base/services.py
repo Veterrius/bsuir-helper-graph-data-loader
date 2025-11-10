@@ -79,7 +79,6 @@ class DirectoryFileDataLoader(ABC):
                 self.index.vector_store.persist,
                 persist_path=str(settings.VECTOR_STORE_PATH)
             )
-            self.index.
         return DataLoadingResult(
             status="ok",
             files_loaded=files_processed,
