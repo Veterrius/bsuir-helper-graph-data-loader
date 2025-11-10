@@ -4,7 +4,7 @@ from typing import Set
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .models import Extension
+from .models import Extension, Url
 
 class Settings(BaseSettings):
     UPLOAD_DIR: Path
@@ -12,12 +12,7 @@ class Settings(BaseSettings):
     ALLOWED_EXTENSIONS: Set[Extension]
     MODEL_NAME: str
     EMBEDDINGS_MODEL_NAME: str
-    NEBULA_SPACE_NAME: str
-    VECTOR_STORE_PATH: Path
-    OVERWRITE_GRAPH_STORAGE: bool = False
-    MARKDOWN_REMOVE_HYPERLINKS: bool = True
-    MARKDOWN_REMOVE_IMAGES: bool = True
-    MARKDOWN_SEPARATOR: str = " "
+    OLLAMA_BASE_URL: Url = Url("http://localhost:11434")
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.env"),
