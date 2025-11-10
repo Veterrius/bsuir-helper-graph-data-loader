@@ -71,7 +71,7 @@ class FileData:
         url_path_parts = (
             tuple() 
             if sep_next_index == len(parts) 
-            else tuple((*map(PathPart, parts[sep_next_index:])))
+            else tuple((map(PathPart, parts[sep_next_index:])))
         )
         return scheme, domains, url_path_parts 
     
@@ -91,7 +91,11 @@ class FileData:
         else:
             content = None
         url = cls.get_url_from_path(path) 
-        return cls(url=Url(url), extension=path.suffix, content=content)
+        return cls(
+            url=Url(url),
+            extension=Extension(path.suffix),
+            content=content
+        )
     
     @classmethod
     def from_file_info(cls, file_info: FileInfo) -> FileData:
@@ -107,6 +111,6 @@ class FileData:
                 else 'unknown'
             ),
             upload_time=datetime.fromtimestamp(
-                (settings.get_upload_dir() / self.path).stat().st_birthtime
+                (settings.UPLOAD_DIR / self.path).stat().st_birthtime
             )
         )
