@@ -12,8 +12,11 @@ class Settings(BaseSettings):
     MODEL_NAME: str
     EMBEDDINGS_MODEL_NAME: str
     NEBULA_SPACE_NAME: str
-    VECTOR_STORE_PATH: str
+    VECTOR_STORE_PATH: Path
     OVERWRITE_GRAPH_STORAGE: bool = False
+    MARKDOWN_REMOVE_HYPERLINKS: bool = True
+    MARKDOWN_REMOVE_IMAGES: bool = True
+    MARKDOWN_SEPARATOR: str = " "
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.env"),
