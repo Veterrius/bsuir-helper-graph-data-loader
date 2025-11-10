@@ -1,0 +1,20 @@
+[project]
+name = "bsuir-helper-graph-data-loader"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.121.1",
+    "httpx>=0.28.1",
+    "llama-index>=0.14.7",
+    "llama-index-graph-stores-nebula>=0.5.1",
+    "mistune>=3.1.4",
+    "organisation-utils",
+    "pydantic>=2.12.4",
+    "requests>=2.32.5",
+    "uvicorn>=0.38.0",
+]
+
+[tool.uv.sources]
+organisation-utils = { url = "https://github.com/semantic-hallucinations/semantic-hallucinations-utils/archive/refs/heads/main.zip" }
