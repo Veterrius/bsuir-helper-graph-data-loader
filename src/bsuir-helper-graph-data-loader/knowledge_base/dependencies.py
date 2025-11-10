@@ -8,7 +8,7 @@ from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
 
 from .services import DirectoryFileDataLoader, MarkdownFileDataLoader
-from ..config import settings
+from .config import settings
 
 
 def get_graph_store() -> PropertyGraphStore:

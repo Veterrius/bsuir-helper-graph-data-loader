@@ -7,8 +7,8 @@ from llama_index.core import PropertyGraphIndex, Document
 from llama_index.readers.file.markdown import MarkdownReader
 from organisation_utils.logging_config import logger_factory
 
-from ..config import settings
 from ..models import FileData
+from .config import settings
 from .schemas import DataLoadingResult 
 
 

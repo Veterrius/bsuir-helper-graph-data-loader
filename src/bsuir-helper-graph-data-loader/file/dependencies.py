@@ -4,7 +4,7 @@ from .config import settings
 
 def get_file_service() -> FileService:
     return FileService(
-        settings.get_upload_dir(),
-        settings.get_max_file_size(),
-        settings.get_allowed_extensions()
+        settings.UPLOAD_DIR,
+        settings.MAX_FILE_SIZE,
+        settings.ALLOWED_EXTENSIONS
     )

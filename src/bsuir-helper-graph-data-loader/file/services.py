@@ -15,17 +15,17 @@ class FileService:
         self.upload_dir = (
             upload_dir
             if upload_dir is not None
-            else settings.get_upload_dir()
+            else settings.UPLOAD_DIR
         )
         self.max_file_size = (
             max_file_size
             if max_file_size is not None
-            else settings.get_max_file_size()
+            else settings.MAX_FILE_SIZE
         )
         self.allowed_extensions = (
             allowed_extensions
             if allowed_extensions is not None
-            else settings.get_allowed_extensions()
+            else settings.ALLOWED_EXTENSIONS
         )
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 

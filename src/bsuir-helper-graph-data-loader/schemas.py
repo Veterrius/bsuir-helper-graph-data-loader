@@ -1,6 +1,8 @@
 from datetime import datetime
 from pathlib import Path
+
 from pydantic import BaseModel, field_validator
+
 from config import settings
 
 
@@ -18,7 +20,7 @@ class FileInfo(CustomModel):
     @classmethod
     def validate_extension(cls, v: str) -> str:
         suf = Path(v).suffix.lower()
-        if suf and suf not in settings.get_all:
+        if suf and suf not in settings.ALLOWED_EXTENSIONS:
             raise ValueError(f"Extension {suf} not allowed")
         return v
 
