@@ -111,6 +111,6 @@ class FileData:
                 else 'unknown'
             ),
             upload_time=datetime.fromtimestamp(
-                (settings.UPLOAD_DIR / self.path).stat().st_birthtime
+                (settings.UPLOAD_DIR / self.path).stat().st_mtime
             )
         )
