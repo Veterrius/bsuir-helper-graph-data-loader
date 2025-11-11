@@ -1,0 +1,90 @@
+services:
+  data-loader:
+    build: .
+    ports:
+      - "8080:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      nebula-graphd:
+        condition: service_healthy # Ждем, пока graphd будет полностью готов
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  bsuir-site-parser:
+    image: ghcr.io/veterrius/bsuir-site-parser-modified:e6770bd
+    depends_on:
+      data-loader:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: ["python", "main.py"]
+
+  nebula-metad:
+    image: vesoft/nebula-metad:v3.8.0
+    container_name: nebula-metad
+    command:
+      - --meta_server_addrs=nebula-metad:9559
+      - --local_ip=nebula-metad
+    volumes:
+      - ./nebula/metad:/data/meta
+    restart: unless-stopped
+    # Healthcheck не нужен, полагаемся на healthcheck graphd
+
+  nebula-storaged:
+    image: vesoft/nebula-storaged:v3.8.0
+    container_name: nebula-storaged
+    command:
+      - --meta_server_addrs=nebula-metad:9559
+      - --local_ip=nebula-storaged
+    volumes:
+      - ./nebula/storaged:/data/storage
+    depends_on:
+      nebula-metad:
+        condition: service_started # Достаточно дождаться запуска metad
+    restart: unless-stopped
+    # Healthcheck не нужен, полагаемся на healthcheck graphd
+
+  nebula-graphd:
+    image: vesoft/nebula-graphd:v3.8.0
+    container_name: nebula-graphd
+    command:
+      - --meta_server_addrs=nebula-metad:9559
+      - --local_ip=nebula-graphd
+    ports:
+      - "9669:9669"
+      - "19669:19669" # Открываем порт для healthcheck
+    volumes:
+      - ./nebula/graphd_logs:/logs
+    depends_on:
+      nebula-storaged:
+        condition: service_started # Достаточно дождаться запуска storaged
+    healthcheck:
+      # Проверяем HTTP-статус сервиса graphd
+      test: ["CMD", "curl", "-f", "http://localhost:19669/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10 # Увеличим кол-во попыток на всякий случай
+      start_period: 30s # Даем время на инициализацию
+    restart: unless-stopped
+  
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

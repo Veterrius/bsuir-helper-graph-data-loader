@@ -1,0 +1,38 @@
+# Docker-специфичные файлы
+Dockerfile
+compose.yaml
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Python кэш и артефакты сборки
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.egg-info/
+
+# Виртуальное окружение
+.venv/
+venv/
+
+# Файлы IDE
+.vscode/
+.idea/
+
+# Секреты и локальная конфигурация
+.env
+
+# Локальные инструменты и зависимости
+node_modules/
+# uv.lock
+
+# Документация и тесты (обычно не нужны в production-образе)
+README.md
+LICENSE
+tests/
+example*.py
