@@ -37,7 +37,7 @@ services:
       - --local_ip=nebula-metad
     volumes:
       - ./nebula/metad:/data/meta
-    restart: unless-stoppedd
+    restart: unless-stopped
 
   nebula-storaged:
     image: vesoft/nebula-storaged:v3.8.0
