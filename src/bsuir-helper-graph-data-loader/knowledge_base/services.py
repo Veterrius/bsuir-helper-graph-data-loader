@@ -7,7 +7,7 @@ from llama_index.core import PropertyGraphIndex, Document
 from llama_index.readers.file.markdown import MarkdownReader
 from organisation_utils.logging_config import logger_factory
 
-from ..models import FileData
+from ..models import FileData, Extension
 from .config import settings
 from .schemas import DataLoadingResult 
 
@@ -19,14 +19,12 @@ class DirectoryFileDataLoader(ABC):
     def __init__(
             self,
             root_directory_path: Path,
-            index: PropertyGraphIndex,
-            allowed_extentions: Set[str],
+            allowed_extentions: Set[Extension],
             embed_kg_nodes: bool = True,
             show_progress: bool = True,
     ) -> None:
         self.root_directory_path = root_directory_path
-        self.index = index
-        self.allowed_extentions = {ext.lower() for ext in allowed_extentions}
+        self.allowed_extentions = allowed_extentions
         self.embed_kg_nodes = embed_kg_nodes
         self.show_progress = show_progress
     
@@ -49,7 +47,10 @@ class DirectoryFileDataLoader(ABC):
                     logger.error(f"Failed to process path {file_path}: {e}",
                                   exc_info=True)
 
-    async def load_files_into_storage(self) -> DataLoadingResult:
+    async def load_files_into_storage(
+            self,
+            index: PropertyGraphIndex
+    ) -> DataLoadingResult:
         logger.info("Started to load files into the knowledge base")
         files_processed = 0
         async for file_data in self.read_directory():
@@ -59,7 +60,7 @@ class DirectoryFileDataLoader(ABC):
             )
             try:
                 async for doc in self.read_file(file_data):
-                    await self.index.ainsert(doc)
+                    await index.ainsert(doc)
                 files_processed += 1
                 logger.info(
                     f"Successfully loaded {file_data.path.name} into index"
@@ -71,12 +72,12 @@ class DirectoryFileDataLoader(ABC):
                 )
         logger.info(f"Finished loading. Total files: {files_processed}")
         if (self.embed_kg_nodes 
-            and hasattr(self.index, 'vector_store') 
-            and self.index.vector_store is not None
+            and hasattr(index, 'vector_store') 
+            and index.vector_store is not None
         ):
             logger.info(f"Persisting vector store")
             await asyncio.to_thread(
-                self.index.vector_store.persist,
+                index.vector_store.persist,
                 persist_path=str(settings.VECTOR_STORE_PATH)
             )
         return DataLoadingResult(
@@ -91,17 +92,15 @@ class MarkdownFileDataLoader(DirectoryFileDataLoader):
     def __init__(
             self, 
             root_directory_path: Path, 
-            index: PropertyGraphIndex, 
             embed_kg_nodes: bool = True, 
             show_progress: bool = True,
             remove_hyperlinks: bool = True,
             remove_images: bool = True,
             separator: str = " "
     ) -> None:
-        markdown_extentions = {".md", ".markdown"}
+        markdown_extentions = {Extension(".md"), Extension(".markdown")}
         super().__init__(
             root_directory_path, 
-            index, 
             markdown_extentions,
             embed_kg_nodes, 
             show_progress,
