@@ -36,12 +36,9 @@ def get_index(
     )
 
 
-def get_data_loader(
-        index: PropertyGraphIndex = Depends(get_index)
-) -> DirectoryFileDataLoader:
+def get_data_loader() -> DirectoryFileDataLoader:
     return MarkdownFileDataLoader(
         root_directory_path=settings.UPLOAD_DIR,
-        index=index,
         embed_kg_nodes=settings.EMBEDDINGS_MODEL_NAME is not None,
         show_progress=True,
         remove_hyperlinks=settings.MARKDOWN_REMOVE_HYPERLINKS,

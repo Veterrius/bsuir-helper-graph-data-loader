@@ -1,8 +1,12 @@
 from pathlib import Path
 from typing import List
+from organisation_utils.logging_config import logger_factory
 
 from ..models import FileData, Extension
 from .config import settings
+
+
+logger = logger_factory.get_logger("FILE LOGGER")
 
 
 class FileService:
@@ -25,12 +29,13 @@ class FileService:
         self.allowed_extensions = (
             allowed_extensions
             if allowed_extensions is not None
-            else settings.ALLOWED_EXTENSIONS
+            else set()
         )
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 
     def save_file(self, file_data: FileData) -> FileData:
         """Сохраняет загруженный файл и возвращает метаданные."""
+        logger.info(f"Saving file {file_data.name}...")
         self.max_file_size
         if file_data.content is None:
             raise ValueError("File cannot be created. No content")
@@ -40,7 +45,10 @@ class FileService:
             )
         if file_data.extension not in self.allowed_extensions:
             raise ValueError("File extension not allowed")
-        with open(self.upload_dir / file_data.path, 'wb') as file:
+        full_file_path = self.upload_dir / file_data.path
+        parent_dir = full_file_path.parent
+        parent_dir.mkdir(parents=True, exist_ok=True)
+        with open(full_file_path, 'wb') as file:
             file.write(file_data.content)
         return file_data
 

@@ -1,3 +1,5 @@
+from mimetypes import add_type
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
@@ -9,6 +11,7 @@ from .utils import setup_llm_services
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Application startup...")
+    add_type("text/markdown", ".md")
     setup_llm_services()
     
     yield
