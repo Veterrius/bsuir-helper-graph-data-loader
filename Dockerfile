@@ -24,4 +24,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "bsuir_helper_graph_data_loader.__main__:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "bsuir-helper-graph-data-loader.__main__:app", "--host", "0.0.0.0", "--port", "8000"]

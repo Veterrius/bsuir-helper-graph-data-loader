@@ -9,7 +9,7 @@ services:
       - ./storage:/app/storage
     depends_on:
       nebula-graphd:
-        condition: service_healthy # Ждем, пока graphd будет полностью готов
+        condition: service_healthy
       ollama:
         condition: service_started
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
       start_period: 20s
 
   bsuir-site-parser:
-    image: ghcr.io/veterrius/bsuir-site-parser-modified:e6770bd
+    image: ghcr.io/veterrius/bsuir-site-parser-modified:fe99a12
     depends_on:
       data-loader:
         condition: service_healthy
@@ -37,8 +37,7 @@ services:
       - --local_ip=nebula-metad
     volumes:
       - ./nebula/metad:/data/meta
-    restart: unless-stopped
-    # Healthcheck не нужен, полагаемся на healthcheck graphd
+    restart: unless-stoppedd
 
   nebula-storaged:
     image: vesoft/nebula-storaged:v3.8.0
@@ -50,9 +49,8 @@ services:
       - ./nebula/storaged:/data/storage
     depends_on:
       nebula-metad:
-        condition: service_started # Достаточно дождаться запуска metad
+        condition: service_started
     restart: unless-stopped
-    # Healthcheck не нужен, полагаемся на healthcheck graphd
 
   nebula-graphd:
     image: vesoft/nebula-graphd:v3.8.0
@@ -62,19 +60,18 @@ services:
       - --local_ip=nebula-graphd
     ports:
       - "9669:9669"
-      - "19669:19669" # Открываем порт для healthcheck
+      - "19669:19669"
     volumes:
       - ./nebula/graphd_logs:/logs
     depends_on:
       nebula-storaged:
-        condition: service_started # Достаточно дождаться запуска storaged
+        condition: service_started
     healthcheck:
-      # Проверяем HTTP-статус сервиса graphd
       test: ["CMD", "curl", "-f", "http://localhost:19669/status"]
       interval: 10s
       timeout: 5s
-      retries: 10 # Увеличим кол-во попыток на всякий случай
-      start_period: 30s # Даем время на инициализацию
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
   
   ollama:
