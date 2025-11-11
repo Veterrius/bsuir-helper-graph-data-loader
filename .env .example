@@ -1,0 +1,20 @@
+# ====== MODEL CONFIG ======
+MODEL_NAME=gemma3:1b
+EMBEDDINGS_MODEL_NAME=embeddinggemma
+OLLAMA_BASE_URL=http://ollama:11434 
+
+# ====== FILE CONFIG ======
+UPLOAD_DIR=/app/storage/files 
+MAX_FILE_SIZE=10485760
+
+# ====== KNOWLEDGE BASE CONFIG ======
+NEBULA_SPACE_NAME=test_kb
+VECTOR_STORE_PATH=/app/storage/vector_store/vec_store.json
+OVERWRITE_GRAPH_STORAGE=False 
+MARKDOWN_REMOVE_HYPERLINKS=True 
+MARKDOWN_REMOVE_IMAGES=True
+MARKDOWN_SEPARATOR=" "
+
+# ====== PARSER CONFIG ======
+DATA_LOADER_URL=http://data-loader:8000/files
+
