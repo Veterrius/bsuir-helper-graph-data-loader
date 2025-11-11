@@ -177,4 +177,5 @@ cython_debug/
 .pypirc
 
 # Project specific
-qdrant_data/
+nebula/
+storage/
