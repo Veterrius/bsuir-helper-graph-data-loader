@@ -15,7 +15,7 @@ dependencies = [
     "organisation-utils",
     "pydantic>=2.12.4",
     "requests>=2.32.5",
-    "uvicorn>=0.38.0",
+    "uvicorn[standard]",
 ]
 
 [tool.uv.sources]
